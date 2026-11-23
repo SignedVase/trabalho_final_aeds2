@@ -1,0 +1,56 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rota FANS</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="{% static 'rotaweb/style.css' %}">
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script defer src="{% static 'rotaweb/app.js' %}"></script>
+</head>
+<body>
+  <header><div class="largura topo"><div class="marca"><span aria-hidden="true">↝</span> Rota FANS</div><span>Faculdade de Nova Serrana</span></div></header>
+  <main class="largura">
+    <h1>Planeje sua rota</h1>
+    <div class="layout">
+      <section class="painel controles" aria-label="Planejamento">
+        <h2>Endereços</h2>
+        <form id="consulta" action="{% url 'calcular' %}" method="post" data-logradouros="{% url 'logradouros' %}">
+          {% csrf_token %}
+          <label for="nome">Nome completo</label>
+          <input id="nome" name="nome" autocomplete="name" maxlength="160" placeholder="Seu nome" required>
+          <div class="campo">
+            <label for="origem"><span class="pino a">A</span> Partida</label>
+            <input id="origem" name="origem" autocomplete="off" placeholder="Rua, número, cidade e estado" maxlength="250" required>
+            <ul class="sugestoes" id="lista-origem" role="listbox" aria-label="Sugestões de partida" hidden></ul>
+          </div>
+          <div class="campo">
+            <label for="destino"><span class="pino b">B</span> Chegada</label>
+            <input id="destino" name="destino" autocomplete="off" value="{{ fans }}" maxlength="250" required>
+            <ul class="sugestoes" id="lista-destino" role="listbox" aria-label="Sugestões de chegada" hidden></ul>
+          </div>
+          <button class="primario" type="submit">Calcular rotas</button>
+          <button id="demo" class="secundario" type="button" data-url="{% url 'demo' %}">Ver demonstração</button>
+        </form>
+        <p class="nota">Busque uma rua de Nova Serrana e escolha pelo bairro ou CEP. Você pode adicionar o número após selecionar. <a href="{{ fonte_logradouros }}">Fonte dos logradouros</a></p>
+        <p id="status" role="status"></p>
+        <fieldset id="opcoes" hidden><legend>Rotas disponíveis</legend><div id="alternativas"></div></fieldset>
+        <p class="privacidade">O nome e a partida são salvos no cadastro local. O Photon recebe os endereços e o OSRM recebe as coordenadas.</p>
+      </section>
+      <section class="painel mapa-painel" aria-label="Mapa e detalhes da rota">
+        <div class="cabecalho-mapa">
+          <div><h2>Mapa da rota</h2><p id="resumo" aria-live="polite">Nova Serrana, MG</p></div>
+          <span class="modalidade">Carro</span>
+        </div>
+        <div id="mapa" aria-label="Mapa interativo"></div>
+        <p id="mapa-aviso" class="aviso" hidden></p>
+        <div class="rodape-mapa"><span><i></i> Rota selecionada</span><span><i></i> Alternativas</span></div>
+        <p id="locais" hidden></p>
+      </section>
+    </div>
+  </main>
+  {{ catalogo|json_script:"catalogo" }}
+</body>
+</html>
